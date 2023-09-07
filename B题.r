@@ -6,6 +6,16 @@ raw_result1[1, ] <- 4:-4 * depth_delta + 70
 raw_result1[2, ] <- raw_result1[1, ] * cos(pi / 120) * sin(pi * 5 / 6) * tan(pi / 3) * 2 / sin(pi * 19 / 120)
 raw_result1[3, ] <- 1 - 200 / raw_result1[2, ]
 write.csv(raw_result1, "raw_result1.csv")
+# 第一问画图
+plot_delta <- tan(pi / 3) * 100
+plot(c(-800, 800), c(-90, 0), "n", cex.axis = 2, cex.lab = 1.1, las = 1, xlab = "海底", ylab = "海拔")
+for (i in seq(-800, 800, 200)) {
+    polygon(c(i - plot_delta, i, i + plot_delta), c(-100, 0, -100), col = rgb(0, 0, 0, 0.1), lty = "dotted")
+    # polygon(c(i - plot_delta, i, i + plot_delta), c(-100, 0, -100), border = NA, col = rgb(0, 0, 0, 0.1))
+}
+lines(c(-1000, 1000), c(0, 0), lty = "dashed")
+polygon(c(-1000, 1000, 1000, -1000), c(-(depth_delta * 5 + 70), depth_delta * 5 - 70, -100, -100), col = rgb(1, 1, 1, 0.75))
+
 
 raw_result2 <- read.csv("result2.csv", fileEncoding = "UTF-8-BOM")
 colnames(raw_result2) <- raw_result2[1, ]
