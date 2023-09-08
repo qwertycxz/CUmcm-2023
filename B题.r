@@ -11,7 +11,6 @@ plot_delta <- tan(pi / 3) * 100
 plot(c(-800, 800), c(-90, 0), "n", cex.axis = 2, cex.lab = 1.1, las = 1, xlab = "海底", ylab = "海拔")
 for (i in seq(-800, 800, 200)) {
     polygon(c(i - plot_delta, i, i + plot_delta), c(-100, 0, -100), col = rgb(0, 0, 0, 0.1), lty = "dotted")
-    # polygon(c(i - plot_delta, i, i + plot_delta), c(-100, 0, -100), border = NA, col = rgb(0, 0, 0, 0.1))
 }
 lines(c(-1000, 1000), c(0, 0), lty = "dashed")
 polygon(c(-1000, 1000, 1000, -1000), c(-(depth_delta * 5 + 70), depth_delta * 5 - 70, -100, -100), col = rgb(1, 1, 1, 0.75))
