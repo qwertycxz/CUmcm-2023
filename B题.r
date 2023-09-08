@@ -3,9 +3,12 @@ depth_delta <- tan(pi / 120) * 200
 raw_result1 <- read.csv("result1.csv", fileEncoding = "UTF-8-BOM", row.names = 1)
 raw_result1$X.800 <- c(NA, NA, 0)
 raw_result1[1, ] <- 4:-4 * depth_delta + 70
-raw_result1[2, ] <- raw_result1[1, ] * cos(pi / 120) * sin(pi * 5 / 6) * tan(pi / 3) * 2 / sin(pi * 19 / 120)
+raw_result1[2, ] <- raw_result1[1, ] * (sin(pi * 5 / 6) * tan(pi / 3) / sin(pi * 19 / 120) + sin(pi / 3) / sin(pi * 21 / 120))
 raw_result1[3, ] <- 1 - 200 / raw_result1[2, ]
-write.csv(raw_result1, "raw_result1.csv")
+write.csv(raw_result1, "result1_raw.csv")
+raw_result1[2, ] <- raw_result1[2, ] * cos(pi / 120)
+raw_result1[3, ] <- 1 - 200 / raw_result1[2, ]
+write.csv(raw_result1, "result1_cos.csv")
 # 第一问画图
 plot_delta <- tan(pi / 3) * 100
 plot(c(-800, 800), c(-90, 0), "n", cex.axis = 2, cex.lab = 1.1, las = 1, xlab = "海底", ylab = "海拔")
