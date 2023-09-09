@@ -1,5 +1,5 @@
 library(measurements)
-library(Rsolnp)
+library(nloptr)
 
 # 第一问
 depth_delta <- tan(pi / 120) * 200
@@ -48,6 +48,7 @@ lines(c(-1000, 1000), c(0, 0), lty = "dashed")
 
 
 # 第三问
+# 最简情况
 size_x <- conv_unit(4, "naut_mi", "m")
 size_y <- conv_unit(2, "naut_mi", "m")
 depth_delta <- tan(pi / 120)
@@ -58,17 +59,14 @@ while (pos_x * 2 < size_x) {
     cover_depth <- -depth_delta * pos_x + 110
     cover_left <- cover_depth * sinpi(5 / 6) * tan(pi / 3) / sinpi(19 / 120)
     cover_right <- cover_depth * sin(pi / 3) / sinpi(7 / 40)
-    cover_distance <- (cover_left + cover_right) * sinpi(19 / 120) * 0.88 / sinpi(5 / 6)
+    cover_distance <- (cover_left + cover_right) * sinpi(19 / 120) * 0.9 / sinpi(5 / 6)
     cover_lines <- c(cover_lines, pos_x)
     pos_x <- pos_x + cover_distance
 }
-if (cover_right + cover_lines[length(cover_lines)] * 2 < size_x) {
+if ((cover_right + cover_lines[length(cover_lines)]) * 2 < size_x) {
     cover_lines <- c(cover_lines, size_x / 2)
 }
-# raw_result1[1, ] <- 4:-4 * depth_delta + 110
-# raw_result1[2, ] <- raw_result1[1, ] * (sinpi(5 / 6) * tan(pi / 3) / sinpi(19 / 120) + sin(pi / 3) / sinpi(7 / 40))
-# raw_result1[3, 2:9] <- 1 - sinpi(5 / 6) * 328 / raw_result1[2, ] / sinpi(19 / 120)
-
+# 画图
 plot_delta_x <- conv_unit(tan(pi / 3) * 250, "m", "naut_mi")
 plot_delta_y <- conv_unit(depth_delta * 4, "naut_mi", "m")
 plot(c(-2, 2), c(-200, 0), "n", cex.axis = 2, cex.lab = 1.1, las = 1, xlab = "海底", ylab = "")
@@ -78,6 +76,102 @@ for (i in conv_unit(cover_lines, "m", "naut_mi")) {
 polygon(c(-4, 4, 4, -4), c(-(plot_delta_y + 110), plot_delta_y - 110, -250, -250), col = rgb(1, 1, 1, 0.75))
 lines(c(-2, -2, 2, 2), c(-250, 0, 0, -250), lty = "dashed")
 
+# 一般情况
+size_x <- conv_unit(4, "naut_mi", "m")
+size_y <- conv_unit(2, "naut_mi", "m")
+getDensestLine <- function(angle, as_goal = TRUE) {
+    # size_x_transformed <- size_x / sin(angle)
+    size_x_prolong <- (size_x + size_y / tan(angle)) / 2
+    depth_delta <- cos(angle - pi / 2) * tan(pi / 120)
+    depth_sin1 <- sin(pi / 6 - atan(depth_delta))
+    depth_sin2 <- sin(pi / 6 + atan(depth_delta))
+    cover_lines <- NULL
+    cover_distances <- NULL
+    pos_x <- (size_x / 2 + (tan(pi / 3) * (depth_delta * size_x / 2 + 110) - size_x / 2)) / sin(angle) - size_x / 2
+    while (pos_x < size_x_prolong) {
+        cover_depth <- -depth_delta * pos_x * sin(angle) + 110
+        cover_left <- cover_depth * sinpi(5 / 6) * tan(pi / 3) / depth_sin1
+        cover_right <- cover_depth * sin(pi / 3) / depth_sin2
+        cover_distance <- (cover_left + cover_right) * depth_sin1 * 0.9 / sinpi(5 / 6)
+        cover_distances <- c(cover_distances, cover_distance)
+        cover_lines <- c(cover_lines, pos_x)
+        pos_x <- pos_x + cover_distance * cos(angle - pi / 2) / sin(angle)
+    }
+    if (cover_right + cover_lines[length(cover_lines)] < sin(angle) * size_x_prolong) {
+        cover_lines <- c(cover_lines, size_x_prolong)
+        cover_distances <- c(cover_distances, size_x / sin(angle) - cover_lines[length(cover_lines)])
+    }
+    if (as_goal) {
+        return(cover_lines)
+    }
+    return(cover_distances)
+}
+cover_lines <- getDensestLine(pi / 2)
+cover_distances <- getDensestLine(pi / 2, FALSE)
+write.csv(cover_distances, "result3_raw.csv")
+getDensestPosition <- function(angle) {
+    cover_lines <- getDensestLine(angle)
+    position <- matrix(1:4, 1)[-1, ]
+    colnames(position) <- c("x1", "y1", "x2", "y2")
+    for (i in cover_lines) {
+        x_pos <- NULL
+        y_pos <- NULL
+        x_bottom <- i - size_y / tan(angle)
+        y_left <- size_y / 2 - (size_x / 2 + i) * tan(angle)
+        y_right <-  (size_x / 2 - i) * tan(angle) + size_y / 2
+        if (i > -size_x / 2 && i < size_x / 2) {
+            x_pos <- c(x_pos, i)
+            y_pos <- c(y_pos, size_y / 2)
+        }
+        if (x_bottom > -size_x / 2 && x_bottom < size_x / 2) {
+            x_pos <- c(x_pos, x_bottom)
+            y_pos <- c(y_pos, -size_y / 2)
+        }
+        if (y_right > -size_y / 2 && y_right < size_y / 2) {
+            x_pos <- c(x_pos, size_x / 2)
+            y_pos <- c(y_pos, y_right)
+        }
+        if (y_left > -size_y / 2 && y_left < size_y / 2) {
+            x_pos <- c(x_pos, -size_x / 2)
+            y_pos <- c(y_pos, y_left)
+        }
+        position <- rbind(position, c(x_pos[1], y_pos[1], x_pos[2], y_pos[2]))
+    }
+    return(position)
+}
+getDensestPosition(pi / 2)
+getTotalLength <- function(angle) {
+    cover_position <- getDensestPosition(angle)
+    return(sum(sqrt(apply(cover_position[, c(1, 3)], 1, diff) ^ 2 + apply(cover_position[, c(2, 4)], 1, diff) ^ 2)))
+}
+getTotalLength(pi / 2)
+getCoincidenceRate <- function(angle) {
+    depth_delta <- cos(angle - pi / 2) * tan(pi / 120)
+    depth_sin1 <- sin(pi / 6 - atan(depth_delta))
+    depth_sin2 <- sin(pi / 6 + atan(depth_delta))
+    cover_position <- getDensestPosition(angle)
+    depth_delta <- tan(pi / 120)
+    x_deepest <- apply(cover_position[, c(1, 3)], 1, min)
+    depth_deepest <- -depth_delta * x_deepest + 110
+    # x_swallowest <- apply(cover_position[, c(1, 3)], 1, max)
+    # depth_swallowest <- -depth_delta * x_swallowest + 110
+    # return(depth_deepest * 0.1 / depth_swallowest)
+    cover_left <- depth_deepest * sinpi(5 / 6) * tan(pi / 3) / depth_sin1
+    cover_right <- depth_deepest * sin(pi / 3) / depth_sin2
+    cover_distances <- getDensestLine(angle, FALSE)
+    return(1 - sinpi(5 / 6) * cover_distances / (cover_left + cover_right) / depth_sin1)
+}
+getCoincidenceRate(pi / 2)
+
+# NLopt
+evalF(pi / 2)
+evalGIneq <- function(angle) {
+    return(max(getCoincidenceRate(angle)) - 0.2)
+}
+nlopt <- nloptr(pi / 2, getTotalLength, eval_g_ineq = evalGIneq, lb = 0, ub = pi / 2, opts = list("algorithm" = "NLOPT_GN_ORIG_DIRECT"))
+nlopt <- nloptr(pi / 2, getTotalLength, eval_g_ineq = evalGIneq, lb = 0, ub = pi / 2, opts = list("algorithm" = "NLOPT_GN_ESCH"))
+nlopt
+
 
 # NOT RUN
 fun <- function(angle) {
@@ -85,107 +179,6 @@ fun <- function(angle) {
     depth_angle <- atan(depth_cos * tan(pi / 120))
     (depth_cos * conv_unit(2.1, "naut_mi", "m") * tan(pi / 120) + 120) * (sinpi(5 / 6) * tan(pi / 3) / sin(pi / 6 - depth_angle) + sin(pi / 3) / sinpi(pi / 6 + depth_angle))
 }
-fun <- function(angle, distance) {
-    if (abs(angle) == pi / 2) {
-        return(size_y %/% distance * size_x)
-    }
-    if (angle == 0) {
-        return(size_x %/% distance * size_y)
-    }
-    x_delta <- abs(distance / cos(angle))
-    y_delta <- abs(distance / sin(angle))
-    x_diff <- size_y * tan(angle)
-    y_diff <- size_x / tan(angle)
-    length <- 0
-    k <- 0
-    while (k * x_delta < size_x) {
-        x_bottom <- k * x_delta
-        x_top <- x_diff + x_bottom
-        y_left <- k * y_delta
-        y_right <- y_diff + y_left
-        x_pos <- NA
-        y_pos <- NA
-        if (y_left > 0 && y_left < size_y) {
-            x_pos <- 0
-            y_pos <- y_left
-        }
-        else if (x_top > 0 && x_top < size_x) {
-            x_pos <- x_top
-            y_pos <- size_y
-        }
-        else if (y_right > 0 && y_right < size_y) {
-            x_pos <- size_x
-            y_pos <- y_right
-        }
-        else {
-            k <- k + 1
-            next
-        }
-        length <- length + sqrt((x_bottom - x_pos) ^ 2 + y_pos ^ 2)
-        k <- k + 1
-    }
-    if (angle > 0) {
-        k <- 0
-        while (k * y_delta < size_y) {
-            x_bottom <- k * x_delta
-            x_top <- x_diff + x_bottom
-            y_left <- k * y_delta
-            y_right <- y_diff + y_left
-            x_pos <- NA
-            y_pos <- NA
-            if (x_bottom > 0 && x_bottom < size_x) {
-                x_pos <- x_bottom
-                y_pos <- 0
-            }
-            else if (x_top > 0 && x_top < size_x) {
-                x_pos <- x_top
-                y_pos <- size_y
-            }
-            else if (y_right > 0 && y_right < size_y) {
-                x_pos <- size_x
-                y_pos <- y_right
-            }
-            else {
-                k <- k + 1
-                next
-            }
-            length <- length + sqrt(x_pos ^ 2 + (y_pos - y_left) ^ 2)
-            k <- k + 1
-        }
-    }
-    else {
-        while (y_diff + k * y_delta < size_y) {
-            x_bottom <- k * x_delta
-            x_top <- x_diff + x_bottom
-            y_left <- k * y_delta
-            y_right <- y_diff + y_left
-            x_pos <- NA
-            y_pos <- NA
-            if (x_bottom > 0 && x_bottom < size_x) {
-                x_pos <- x_bottom
-                y_pos <- 0
-            }
-            else if (y_left > 0 && y_left < size_y) {
-                x_pos <- 0
-                y_pos <- y_left
-            }
-            else if (x_top > 0 && x_top < size_x) {
-                x_pos <- x_top
-                y_pos <- size_y
-            }
-            else {
-                k <- k + 1
-                next
-            }
-            length <- length + sqrt((size_y - x_pos) ^ 2 + (y_pos - y_right) ^ 2)
-            k <- k + 1
-        }
-    }
-    return(length)
-}
-fun(pi * 2 / 3, 100)
-
-
 raw_attachment <- read.csv("附件.csv", fileEncoding = "UTF-8-BOM")
 colnames(raw_attachment) <- raw_attachment[1, ]
 raw_attachment <- raw_attachment[-1, ]
