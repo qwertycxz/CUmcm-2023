@@ -164,13 +164,22 @@ getCoincidenceRate <- function(angle) {
 getCoincidenceRate(pi / 2)
 
 # NLopt
-evalF(pi / 2)
 evalGIneq <- function(angle) {
     return(max(getCoincidenceRate(angle)) - 0.2)
 }
 nlopt <- nloptr(pi / 2, getTotalLength, eval_g_ineq = evalGIneq, lb = 0, ub = pi / 2, opts = list("algorithm" = "NLOPT_GN_ORIG_DIRECT"))
 nlopt <- nloptr(pi / 2, getTotalLength, eval_g_ineq = evalGIneq, lb = 0, ub = pi / 2, opts = list("algorithm" = "NLOPT_GN_ESCH"))
 nlopt
+length_data <- matrix(1:2, 1)[-1, ]
+for (i in seq(pi / 180, pi / 2, length.out = 1000)) {
+    length_data <- rbind(length_data, c(i * 180 / pi, getTotalLength(i)))
+}
+plot(length_data, cex.axis = 2, cex.lab = 1.1, las = 1, type = "l", xlab = "β", ylab = "总长度")
+length_data <- matrix(1:2, 1)[-1, ]
+for (i in seq(pi / 4, pi / 2, length.out = 1000)) {
+    length_data <- rbind(length_data, c(i * 180 / pi, getTotalLength(i)))
+}
+plot(length_data, cex.axis = 2, cex.lab = 1.1, las = 1, xlab = "β", ylab = "总长度")
 
 
 # NOT RUN
