@@ -1,4 +1,5 @@
 library(measurements)
+library(Rsolnp)
 
 # 第一问
 depth_delta <- tan(pi / 120) * 200
@@ -44,6 +45,145 @@ for (i in seq(0, 2.1, 0.3)) {
     polygon(c(i - plot_delta, i, i + plot_delta), c(-250, 0, -250), col = rgb(0, 0, 0, 0.1), lty = "dotted")
 }
 lines(c(-1000, 1000), c(0, 0), lty = "dashed")
+
+
+# 第三问
+size_x <- conv_unit(4, "naut_mi", "m")
+size_y <- conv_unit(2, "naut_mi", "m")
+depth_delta <- tan(pi / 120)
+cover_lines <- NULL
+pos_x <- tan(pi / 3) * (depth_delta * size_x / 2 + 110) - size_x / 2
+x_left <- pos_x
+while (pos_x * 2 < size_x) {
+    cover_depth <- -depth_delta * pos_x + 110
+    cover_left <- cover_depth * sinpi(5 / 6) * tan(pi / 3) / sinpi(19 / 120)
+    cover_right <- cover_depth * sin(pi / 3) / sinpi(7 / 40)
+    cover_distance <- (cover_left + cover_right) * sinpi(19 / 120) * 0.88 / sinpi(5 / 6)
+    cover_lines <- c(cover_lines, pos_x)
+    pos_x <- pos_x + cover_distance
+}
+if (cover_right + cover_lines[length(cover_lines)] * 2 < size_x) {
+    cover_lines <- c(cover_lines, size_x / 2)
+}
+# raw_result1[1, ] <- 4:-4 * depth_delta + 110
+# raw_result1[2, ] <- raw_result1[1, ] * (sinpi(5 / 6) * tan(pi / 3) / sinpi(19 / 120) + sin(pi / 3) / sinpi(7 / 40))
+# raw_result1[3, 2:9] <- 1 - sinpi(5 / 6) * 328 / raw_result1[2, ] / sinpi(19 / 120)
+
+plot_delta_x <- conv_unit(tan(pi / 3) * 250, "m", "naut_mi")
+plot_delta_y <- conv_unit(depth_delta * 4, "naut_mi", "m")
+plot(c(-2, 2), c(-200, 0), "n", cex.axis = 2, cex.lab = 1.1, las = 1, xlab = "海底", ylab = "")
+for (i in conv_unit(cover_lines, "m", "naut_mi")) {
+    polygon(c(i - plot_delta_x, i, i + plot_delta_x), c(-250, 0, -250), col = rgb(0, 0, 0, 0.1), lty = "dotted")
+}
+polygon(c(-4, 4, 4, -4), c(-(plot_delta_y + 110), plot_delta_y - 110, -250, -250), col = rgb(1, 1, 1, 0.75))
+lines(c(-2, -2, 2, 2), c(-250, 0, 0, -250), lty = "dashed")
+
+
+# NOT RUN
+fun <- function(angle) {
+    depth_cos <- cos(angle)
+    depth_angle <- atan(depth_cos * tan(pi / 120))
+    (depth_cos * conv_unit(2.1, "naut_mi", "m") * tan(pi / 120) + 120) * (sinpi(5 / 6) * tan(pi / 3) / sin(pi / 6 - depth_angle) + sin(pi / 3) / sinpi(pi / 6 + depth_angle))
+}
+fun <- function(angle, distance) {
+    if (abs(angle) == pi / 2) {
+        return(size_y %/% distance * size_x)
+    }
+    if (angle == 0) {
+        return(size_x %/% distance * size_y)
+    }
+    x_delta <- abs(distance / cos(angle))
+    y_delta <- abs(distance / sin(angle))
+    x_diff <- size_y * tan(angle)
+    y_diff <- size_x / tan(angle)
+    length <- 0
+    k <- 0
+    while (k * x_delta < size_x) {
+        x_bottom <- k * x_delta
+        x_top <- x_diff + x_bottom
+        y_left <- k * y_delta
+        y_right <- y_diff + y_left
+        x_pos <- NA
+        y_pos <- NA
+        if (y_left > 0 && y_left < size_y) {
+            x_pos <- 0
+            y_pos <- y_left
+        }
+        else if (x_top > 0 && x_top < size_x) {
+            x_pos <- x_top
+            y_pos <- size_y
+        }
+        else if (y_right > 0 && y_right < size_y) {
+            x_pos <- size_x
+            y_pos <- y_right
+        }
+        else {
+            k <- k + 1
+            next
+        }
+        length <- length + sqrt((x_bottom - x_pos) ^ 2 + y_pos ^ 2)
+        k <- k + 1
+    }
+    if (angle > 0) {
+        k <- 0
+        while (k * y_delta < size_y) {
+            x_bottom <- k * x_delta
+            x_top <- x_diff + x_bottom
+            y_left <- k * y_delta
+            y_right <- y_diff + y_left
+            x_pos <- NA
+            y_pos <- NA
+            if (x_bottom > 0 && x_bottom < size_x) {
+                x_pos <- x_bottom
+                y_pos <- 0
+            }
+            else if (x_top > 0 && x_top < size_x) {
+                x_pos <- x_top
+                y_pos <- size_y
+            }
+            else if (y_right > 0 && y_right < size_y) {
+                x_pos <- size_x
+                y_pos <- y_right
+            }
+            else {
+                k <- k + 1
+                next
+            }
+            length <- length + sqrt(x_pos ^ 2 + (y_pos - y_left) ^ 2)
+            k <- k + 1
+        }
+    }
+    else {
+        while (y_diff + k * y_delta < size_y) {
+            x_bottom <- k * x_delta
+            x_top <- x_diff + x_bottom
+            y_left <- k * y_delta
+            y_right <- y_diff + y_left
+            x_pos <- NA
+            y_pos <- NA
+            if (x_bottom > 0 && x_bottom < size_x) {
+                x_pos <- x_bottom
+                y_pos <- 0
+            }
+            else if (y_left > 0 && y_left < size_y) {
+                x_pos <- 0
+                y_pos <- y_left
+            }
+            else if (x_top > 0 && x_top < size_x) {
+                x_pos <- x_top
+                y_pos <- size_y
+            }
+            else {
+                k <- k + 1
+                next
+            }
+            length <- length + sqrt((size_y - x_pos) ^ 2 + (y_pos - y_right) ^ 2)
+            k <- k + 1
+        }
+    }
+    return(length)
+}
+fun(pi * 2 / 3, 100)
 
 
 raw_attachment <- read.csv("附件.csv", fileEncoding = "UTF-8-BOM")
