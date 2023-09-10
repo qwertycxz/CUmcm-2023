@@ -274,8 +274,8 @@ for (i in cover_lines1) {
 }
 plot_xy_x <- NULL
 add_zero <- TRUE
-for (i in cover_lines2) {
-    plot_xy_x <- c(plot_xy_x, size_x - i)
+for (i in rev(cover_lines2)) {
+    plot_xy_x <- c(plot_xy_x, i)
     if (add_zero) {
         plot_xy_x <- c(plot_xy_x, size_x, size_x)
     }
@@ -283,8 +283,8 @@ for (i in cover_lines2) {
 }
 plot_xy_y <- 0
 add_zero <- FALSE
-for (i in cover_lines2) {
-    plot_xy_y <- c(plot_xy_y, (size_x - i) * 1.25)
+for (i in rev(cover_lines2)) {
+    plot_xy_y <- c(plot_xy_y, i * 1.25)
     if (add_zero) {
         plot_xy_y <- c(plot_xy_y, 0, 0)
     }
