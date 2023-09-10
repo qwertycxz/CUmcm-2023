@@ -149,12 +149,11 @@ getCoincidenceRate <- function(angle) {
     depth_sin1 <- sin(pi / 6 - atan(depth_delta))
     depth_sin2 <- sin(pi / 6 + atan(depth_delta))
     cover_position <- getDensestPosition(angle)
-    depth_delta <- tan(pi / 120)
     x_deepest <- apply(cover_position[, c(1, 3)], 1, min)
     depth_deepest <- -depth_delta * x_deepest + 110
-    # x_swallowest <- apply(cover_position[, c(1, 3)], 1, max)
-    # depth_swallowest <- -depth_delta * x_swallowest + 110
-    # return(depth_deepest * 0.1 / depth_swallowest)
+    # x_shallowest <- apply(cover_position[, c(1, 3)], 1, max)
+    # depth_shallowest <- -depth_delta * x_shallowest + 110
+    # return(depth_deepest * 0.1 / depth_shallowest)
     cover_left <- depth_deepest * sinpi(5 / 6) * tan(pi / 3) / depth_sin1
     cover_right <- depth_deepest * sin(pi / 3) / depth_sin2
     cover_distances <- getDensestLine(angle, FALSE)
@@ -284,12 +283,38 @@ for (i in rev(cover_lines2)) {
 plot_xy_y <- 0
 add_zero <- FALSE
 for (i in rev(cover_lines2)) {
-    plot_xy_y <- c(plot_xy_y, i * 1.25)
+    plot_xy_y <- c(plot_xy_y, (size_x - i) * 1.25)
     if (add_zero) {
         plot_xy_y <- c(plot_xy_y, 0, 0)
     }
     add_zero <- !add_zero
 }
-plot_xy_y <- rev(plot_xy_y)[-1]
+plot_xy_y <- plot_xy_y[-length(plot_xy_y)]
 plot(plot_x, rep(cover_lines1, each = 2), "l", cex.axis = 2, cex.lab = 1.1, xlab = "东西向(m)", ylab = "南北向(m)")
 lines(c(size_x, plot_xy_x[-(1:2)]), c(size_y, plot_xy_y[-(1:2)]))
+# 重叠率计算
+area_too_shallow <- 0
+area_total <- 0
+length_too_deep <- 0
+length_total <- 0
+for (i in conv_unit(cover_lines1, "m", "naut_mi")) {
+    pos_x <- ceiling(i * 40) # 序号(从0开始)
+    depth_vector <- unlist(getYDepth(i)[1:pos_x + 1])
+    cover_depth <- mean(depth_vector) # 米
+    area_too_shallow <- sum(area_too_shallow, cover_depth - depth_vector[depth_vector < cover_depth * 8 / 9])
+    area_total <- area_total + cover_depth * length(depth_vector)
+    length_too_deep <- length_too_shallow + length(depth_vector[depth_vector > cover_depth * 10 / 9])
+    length_total <- length_total + length(depth_vector)
+}
+for (i in conv_unit(cover_lines2, "m", "naut_mi")) {
+    seq_x <- seq(4, i, -0.02) # 序列, 海里
+    seq_y <- seq_x * 1.25 # 序列, 海里
+    depth_vector <- unlist(apply(cbind(seq_x, seq_y), 1, getDepth))
+    cover_depth <- mean(depth_vector) # 米
+    area_too_shallow <- sum(area_too_shallow, cover_depth - depth_vector[depth_vector < cover_depth * 8 / 9])
+    area_total <- area_total + cover_depth * length(depth_vector)
+    length_too_deep <- length_too_shallow + length(depth_vector[depth_vector > cover_depth * 10 / 9])
+    length_total <- length_total + length(depth_vector)
+}
+size_x * size_y * area_too_shallow / area_total
+length_too_deep / length_total
