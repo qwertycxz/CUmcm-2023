@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="httpgd" width="640.00" height="800.00" viewBox="0 0 640.00 800.00">
+<defs>
+  <style type='text/css'><![CDATA[
+    .httpgd line, .httpgd polyline, .httpgd polygon, .httpgd path, .httpgd rect, .httpgd circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+  ]]></style>
+<clipPath id="c0"><rect x="0.00" y="0.00" width="640.00" height="800.00"/></clipPath>
+<clipPath id="c1"><rect x="59.04" y="59.04" width="550.72" height="667.52"/></clipPath>
+<clipPath id="c2"><rect x="0.00" y="0.00" width="640.00" height="800.00"/></clipPath>
+<clipPath id="c3"><rect x="59.04" y="59.04" width="550.72" height="667.52"/></clipPath>
+</defs>
+<rect width="100%" height="100%" style="stroke: none;fill: #FFFFFF;"/>
+<g clip-path="url(#c0)">
+</g><g clip-path="url(#c1)">
+<polyline points="589.36,83.76 79.44,83.76 79.44,108.79 568.88,108.79 549.18,132.85 79.44,132.85 79.44,155.93 530.29,155.93 512.20,178.02 79.44,178.02 79.44,199.15 494.90,199.15 478.39,219.32 79.44,219.32 79.44,238.59 462.62,238.59 447.57,256.97 79.44,256.97 79.44,274.50 433.21,274.50 419.53,291.22 79.44,291.22 79.44,307.19 406.46,307.19 393.97,322.44 79.44,322.44 79.44,337.01 382.05,337.01 370.65,350.93 79.44,350.93 79.44,364.27 359.73,364.27 349.28,377.02 79.44,377.02 79.44,389.26 339.27,389.26 329.65,401.01 79.44,401.01 79.44,412.33 320.38,412.33 311.47,423.21 79.44,423.21 79.44,433.72 302.87,433.72 294.59,443.84 79.44,443.84 79.44,453.62 286.58,453.62 278.83,463.09 79.44,463.09 79.44,472.27 271.31,472.27 264.03,481.17 79.44,481.17 79.44,489.81 256.95,489.81 250.07,498.22 79.44,498.22 79.44,506.40 243.37,506.40 236.82,514.40 79.44,514.40 79.44,522.20 230.43,522.20 224.17,529.85 79.44,529.85 79.44,537.33 218.05,537.33 212.03,544.68 79.44,544.68 79.44,551.92 206.11,551.92 200.29,559.02 79.44,559.02 79.44,566.03 194.55,566.03 188.88,572.96 79.44,572.96 79.44,579.79 183.29,579.79 177.74,586.56 79.44,586.56 79.44,593.28 172.25,593.28 166.79,599.95 79.44,599.95 79.44,606.58 161.36,606.58 155.95,613.19 79.44,613.19 79.44,619.78 150.55,619.78 145.16,626.37 79.44,626.37 79.44,632.96 139.76,632.96 134.35,639.58 79.44,639.58 79.44,646.21 128.91,646.21 123.44,652.89 79.44,652.89 79.44,659.62 117.94,659.62 112.39,666.40 79.44,666.40 79.44,673.28 106.75,673.28 101.05,680.25 79.44,680.25 79.44,687.32 95.26,687.32 89.39,694.49 79.44,694.49 79.44,701.84 83.38,701.84" style="stroke-width: 0.75;"/>
+</g><g clip-path="url(#c2)">
+<line x1="79.44" y1="726.56" x2="492.44" y2="726.56" style="stroke-width: 0.75;"/>
+<line x1="79.44" y1="726.56" x2="79.44" y2="733.76" style="stroke-width: 0.75;"/>
+<line x1="217.11" y1="726.56" x2="217.11" y2="733.76" style="stroke-width: 0.75;"/>
+<line x1="354.78" y1="726.56" x2="354.78" y2="733.76" style="stroke-width: 0.75;"/>
+<line x1="492.44" y1="726.56" x2="492.44" y2="733.76" style="stroke-width: 0.75;"/>
+<g><text x="79.44" y="752.48" text-anchor="middle" style="font-family: Arial;font-size: 24.00px;" textLength="13.35px" lengthAdjust="spacingAndGlyphs">0</text></g>
+<g><text x="217.11" y="752.48" text-anchor="middle" style="font-family: Arial;font-size: 24.00px;" textLength="53.40px" lengthAdjust="spacingAndGlyphs">2000</text></g>
+<g><text x="354.78" y="752.48" text-anchor="middle" style="font-family: Arial;font-size: 24.00px;" textLength="53.40px" lengthAdjust="spacingAndGlyphs">4000</text></g>
+<g><text x="492.44" y="752.48" text-anchor="middle" style="font-family: Arial;font-size: 24.00px;" textLength="53.40px" lengthAdjust="spacingAndGlyphs">6000</text></g>
+<line x1="59.04" y1="706.65" x2="59.04" y2="168.52" style="stroke-width: 0.75;"/>
+<line x1="59.04" y1="706.65" x2="51.84" y2="706.65" style="stroke-width: 0.75;"/>
+<line x1="59.04" y1="572.12" x2="51.84" y2="572.12" style="stroke-width: 0.75;"/>
+<line x1="59.04" y1="437.58" x2="51.84" y2="437.58" style="stroke-width: 0.75;"/>
+<line x1="59.04" y1="303.05" x2="51.84" y2="303.05" style="stroke-width: 0.75;"/>
+<line x1="59.04" y1="168.52" x2="51.84" y2="168.52" style="stroke-width: 0.75;"/>
+<g><text transform="translate(41.76,706.65) rotate(-90.00)" text-anchor="middle" style="font-family: Arial;font-size: 24.00px;" textLength="13.35px" lengthAdjust="spacingAndGlyphs">0</text></g>
+<g><text transform="translate(41.76,572.12) rotate(-90.00)" text-anchor="middle" style="font-family: Arial;font-size: 24.00px;" textLength="53.40px" lengthAdjust="spacingAndGlyphs">2000</text></g>
+<g><text transform="translate(41.76,437.58) rotate(-90.00)" text-anchor="middle" style="font-family: Arial;font-size: 24.00px;" textLength="53.40px" lengthAdjust="spacingAndGlyphs">4000</text></g>
+<g><text transform="translate(41.76,303.05) rotate(-90.00)" text-anchor="middle" style="font-family: Arial;font-size: 24.00px;" textLength="53.40px" lengthAdjust="spacingAndGlyphs">6000</text></g>
+<g><text transform="translate(41.76,168.52) rotate(-90.00)" text-anchor="middle" style="font-family: Arial;font-size: 24.00px;" textLength="53.40px" lengthAdjust="spacingAndGlyphs">8000</text></g>
+<polygon points="59.04,726.56 609.76,726.56 609.76,59.04 59.04,59.04" style="stroke-width: 0.75;" />
+<g><text x="334.40" y="781.28" text-anchor="middle" style="font-family: Arial;font-size: 13.20px;" textLength="49.45px" lengthAdjust="spacingAndGlyphs">东西向(m)</text></g>
+<g><text transform="translate(12.96,392.80) rotate(-90.00)" text-anchor="middle" style="font-family: Arial;font-size: 13.20px;" textLength="49.45px" lengthAdjust="spacingAndGlyphs">南北向(m)</text></g>
+</g><g clip-path="url(#c3)">
+<polyline points="589.36,83.76 589.36,106.47 101.06,706.65 123.25,706.65 589.36,126.07 589.36,146.10 145.91,706.65 168.90,706.65 589.36,166.55 589.36,187.49 192.08,706.65 215.31,706.65 589.36,208.97 589.36,231.00 238.48,706.65 261.49,706.65 589.36,253.60 589.36,276.77 284.24,706.65 306.64,706.65 589.36,300.60 589.36,325.08 328.63,706.65 350.20,706.65 589.36,350.19 589.36,375.90 371.25,706.65 391.81,706.65 589.36,402.25 589.36,429.11 411.85,706.65 431.36,706.65 589.36,456.48 589.36,484.27 450.33,706.65 468.83,706.65 589.36,512.37 589.36,540.68 486.86,706.65 504.45,706.65 589.36,569.05 589.36,597.36 521.59,706.65 538.33,706.65 589.36,625.44 589.36,653.13 554.73,706.65 570.78,706.65 589.36,680.23 589.36,706.65 586.55,706.65" style="stroke-width: 0.75;"/>
+</g>
+</svg>

@@ -75,7 +75,6 @@ for (i in conv_unit(cover_lines, "m", "naut_mi")) {
 }
 polygon(c(-4, 4, 4, -4), c(-(plot_delta_y + 110), plot_delta_y - 110, -250, -250), col = rgb(1, 1, 1, 0.75))
 lines(c(-2, -2, 2, 2), c(-250, 0, 0, -250), lty = "dashed")
-
 # 一般情况
 size_x <- conv_unit(4, "naut_mi", "m")
 size_y <- conv_unit(2, "naut_mi", "m")
@@ -162,7 +161,6 @@ getCoincidenceRate <- function(angle) {
     return(1 - sinpi(5 / 6) * cover_distances / (cover_left + cover_right) / depth_sin1)
 }
 getCoincidenceRate(pi / 2)
-
 # NLopt
 evalGIneq <- function(angle) {
     return(max(getCoincidenceRate(angle)) - 0.2)
@@ -174,23 +172,124 @@ length_data <- matrix(1:2, 1)[-1, ]
 for (i in seq(pi / 180, pi / 2, length.out = 1000)) {
     length_data <- rbind(length_data, c(i * 180 / pi, getTotalLength(i)))
 }
-plot(length_data, cex.axis = 2, cex.lab = 1.1, las = 1, type = "l", xlab = "β", ylab = "总长度")
+plot(length_data, cex.axis = 2, cex.lab = 1.1, type = "l", xlab = "β", ylab = "总长度")
 length_data <- matrix(1:2, 1)[-1, ]
 for (i in seq(pi / 4, pi / 2, length.out = 1000)) {
     length_data <- rbind(length_data, c(i * 180 / pi, getTotalLength(i)))
 }
-plot(length_data, cex.axis = 2, cex.lab = 1.1, las = 1, xlab = "β", ylab = "总长度")
+plot(length_data, cex.axis = 2, cex.lab = 1.1, xlab = "β", ylab = "总长度")
+# fun <- function(angle) {
+#     depth_cos <- cos(angle)
+#     depth_angle <- atan(depth_cos * tan(pi / 120))
+#     (depth_cos * conv_unit(2.1, "naut_mi", "m") * tan(pi / 120) + 120) * (sinpi(5 / 6) * tan(pi / 3) / sin(pi / 6 - depth_angle) + sin(pi / 3) / sinpi(pi / 6 + depth_angle))
+# }
 
 
-# NOT RUN
-fun <- function(angle) {
-    depth_cos <- cos(angle)
-    depth_angle <- atan(depth_cos * tan(pi / 120))
-    (depth_cos * conv_unit(2.1, "naut_mi", "m") * tan(pi / 120) + 120) * (sinpi(5 / 6) * tan(pi / 3) / sin(pi / 6 - depth_angle) + sin(pi / 3) / sinpi(pi / 6 + depth_angle))
-}
+# 第四问
 raw_attachment <- read.csv("附件.csv", fileEncoding = "UTF-8-BOM")
 colnames(raw_attachment) <- raw_attachment[1, ]
-raw_attachment <- raw_attachment[-1, ]
-row.names(raw_attachment) <- raw_attachment[, 2]
-raw_attachment <- raw_attachment[, -(1:2)]
-contour(pin = c(1, 1), z = as.matrix(raw_attachment))
+named_attachment <- raw_attachment[-1, ]
+row.names(named_attachment) <- named_attachment[, 2]
+matrix_attachment <- named_attachment[, -(1:2)]
+contour(z = as.matrix(matrix_attachment))
+getYDepth <- function(y) {
+    pos <- NA
+    if (y %in% row.names(matrix_attachment)) {
+        pos <- matrix_attachment[as.character(y), ]
+    }
+    else {
+        y_floor <- floor(y * 50) / 50
+        pos <- (matrix_attachment[as.character(y_floor + 0.02), ] - matrix_attachment[as.character(y_floor), ]) * (y - y_floor) / 0.02 + matrix_attachment[as.character(y_floor), ]
+    }
+    return(pos)
+}
+getDepth <- function(x, y = NULL) {
+    if (is.null(y)) {
+        y <- x[2]
+        x <- x[1]
+    }
+    pos <- getYDepth(y)
+    if (x %in% colnames(matrix_attachment)) {
+        return(pos[as.character(x)])
+    }
+    x_floor <- floor(x * 50) / 50
+    return((pos[as.character(x_floor + 0.02)] - pos[as.character(x_floor)]) * (x - x_floor) / 0.02 + pos[as.character(x_floor)])
+}
+# 东西向航线(北深南浅)
+size_x <- conv_unit(4, "naut_mi", "m")
+size_y <- conv_unit(5, "naut_mi", "m")
+cover_lines <- NULL
+cover_length <- 0
+pos_y <- 5 # 海里
+while (pos_y >= 0) {
+    pos_x <- ceiling(pos_y * 40) # 序号(从0开始)
+    cover_depth <- mean(unlist(getYDepth(pos_y)[1:pos_x + 1])) # 米
+    depth_delta <- abs(cover_depth - 24.4) / size_y # 米
+    depth_angle <- atan(depth_delta) # 弧度
+    cover_left <- cover_depth * sinpi(5 / 6) * tan(pi / 3) / sin(pi / 6 - depth_angle) # 米
+    cover_right <- cover_depth * sin(pi / 3) / sinpi(pi / 6 + depth_angle) # 米
+    cover_distance <- (cover_left + cover_right) * sinpi(pi / 6 - depth_angle) * 0.9 / sinpi(5 / 6) # 米
+    cover_lines <- c(cover_lines, pos_y) # 海里
+    cover_length <- cover_length + pos_y * 0.8 # 海里
+    pos_y <- pos_y - conv_unit(cover_distance, "m", "naut_mi")
+}
+cover_lines1 <- conv_unit(cover_lines, "naut_mi", "m")
+cover_length1 <- conv_unit(cover_length, "naut_mi", "m")
+if ((cover_right < cover_lines[length(cover_lines)])) {
+    cover_lines1 <- c(cover_lines1, 0)
+}
+write.csv(cover_lines1, "result4_left_y_pos.csv")
+# 西南-东北向航线(东南深西北浅)
+cover_lines <- NULL
+cover_length <- 0
+pos_x <- 4 # 海里
+while (pos_x >= 0) {
+    seq_x <- seq(4, pos_x, -0.02) # 序列, 海里
+    seq_y <- seq_x * 1.25 # 序列, 海里
+    cover_depth <- mean(unlist(apply(cbind(seq_x, seq_y), 1, getDepth))) # 米
+    depth_delta <- abs(cover_depth - 197.2) / sqrt((size_x / 2) ^ 2 + (size_y / 2) ^ 2) # 米
+    depth_angle <- atan(depth_delta) # 弧度
+    cover_left <- cover_depth * sinpi(5 / 6) * tan(pi / 3) / sin(pi / 6 - depth_angle) # 米
+    cover_right <- cover_depth * sin(pi / 3) / sinpi(pi / 6 + depth_angle) # 米
+    cover_distance <- (cover_left + cover_right) * sinpi(pi / 6 - depth_angle) * 0.9 / sinpi(5 / 6) # 米
+    cover_lines <- c(cover_lines, pos_x) # 海里
+    cover_length <- cover_length + pos_x * 0.8 # 海里
+    pos_x <- pos_x - conv_unit(cover_distance, "m", "naut_mi")
+}
+cover_lines2 <- conv_unit(cover_lines, "naut_mi", "m")
+cover_length2 <- conv_unit(cover_length, "naut_mi", "m")
+if ((cover_right < cover_lines[length(cover_lines)])) {
+    cover_lines2 <- c(cover_lines2, 0)
+}
+write.csv(cover_lines2[-length(cover_lines2)], "result4_right_x_pos.csv")
+# 画图
+plot_x <- NULL
+add_zero <- TRUE
+for (i in cover_lines1) {
+    plot_x <- c(plot_x, i * 0.8)
+    if (add_zero) {
+        plot_x <- c(plot_x, 0, 0)
+    }
+    add_zero <- !add_zero
+}
+plot_xy_x <- NULL
+add_zero <- TRUE
+for (i in cover_lines2) {
+    plot_xy_x <- c(plot_xy_x, size_x - i)
+    if (add_zero) {
+        plot_xy_x <- c(plot_xy_x, size_x, size_x)
+    }
+    add_zero <- !add_zero
+}
+plot_xy_y <- 0
+add_zero <- FALSE
+for (i in cover_lines2) {
+    plot_xy_y <- c(plot_xy_y, (size_x - i) * 1.25)
+    if (add_zero) {
+        plot_xy_y <- c(plot_xy_y, 0, 0)
+    }
+    add_zero <- !add_zero
+}
+plot_xy_y <- rev(plot_xy_y)[-1]
+plot(plot_x, rep(cover_lines1, each = 2), "l", cex.axis = 2, cex.lab = 1.1, xlab = "东西向(m)", ylab = "南北向(m)")
+lines(c(size_x, plot_xy_x[-(1:2)]), c(size_y, plot_xy_y[-(1:2)]))
